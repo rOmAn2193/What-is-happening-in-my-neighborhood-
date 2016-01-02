@@ -1,31 +1,26 @@
 import Foundation
 import UIKit
 
-class DataService
-{
+class DataService {
     static let instance = DataService()
 
     let KEY_POSTS = "posts"
     private var _loadedPosts = [Post]()
 
-    var loadedPosts: [Post]
-    {
+    var loadedPosts: [Post] {
         return _loadedPosts
     }
 
-    func savePosts()
-    {
+    func savePosts() {
         let postsData = NSKeyedArchiver.archivedDataWithRootObject(_loadedPosts)
-        NSUserDefaults.standardUserDefaults().setObject(postsData, forKey: KEY_POSTS) // taking the array of posts, converting into data, stores it on disk, setting an object and giving it a key
+        NSUserDefaults.standardUserDefaults().setObject(postsData, forKey: KEY_POSTS)
         NSUserDefaults.standardUserDefaults().synchronize()
     }
 
-    func loadPosts()
-    {
-        if let postsData = NSUserDefaults.standardUserDefaults().objectForKey(KEY_POSTS) as? NSData
-        {
-            if let postsArray = NSKeyedUnarchiver.unarchiveObjectWithData(postsData) as? [Post]
-            {
+    func loadPosts() {
+        if let postsData = NSUserDefaults.standardUserDefaults().objectForKey(KEY_POSTS) as? NSData {
+
+            if let postsArray = NSKeyedUnarchiver.unarchiveObjectWithData(postsData) as? [Post] {
                 _loadedPosts = postsArray
             }
         }
@@ -33,8 +28,7 @@ class DataService
         NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "postsLoaded", object: nil))
     }
 
-    func saveImageAndCreatePath(image: UIImage) -> String
-    {
+    func saveImageAndCreatePath(image: UIImage) -> String {
         let imgData = UIImagePNGRepresentation(image)
         let imgPath = "image\(NSDate.timeIntervalSinceReferenceDate()).png"
         let fullPath = documentsPathForFileName(imgPath)
@@ -42,24 +36,22 @@ class DataService
         return imgPath
     }
 
-    func imageForPath(path: String) -> UIImage?
-    {
+    func imageForPath(path: String) -> UIImage? {
         let fullPath = documentsPathForFileName(path)
         let image = UIImage(named: fullPath)
         return image
     }
 
-    func addPost(post: Post)
-    {
+    func addPost(post: Post) {
         _loadedPosts.append(post)
         savePosts()
         loadPosts()
     }
 
-    func documentsPathForFileName(name: String) -> String
-    {
+    func documentsPathForFileName(name: String) -> String {
         let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
-        let fullPath = paths [0] as NSString
+        let fullPath = paths[0] as NSString
         return fullPath.stringByAppendingPathComponent(name)
     }
+
 }
